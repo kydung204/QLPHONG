@@ -333,20 +333,29 @@
 
                 const sortedTransactions = filteredTransactions.sort((a, b) => b.timestamp - a.timestamp);
 
-                transactionList.innerHTML = sortedTransactions.map(transaction => `
-                    <div class="transaction-item">
-                        <div class="transaction-header">
-                            <span class="transaction-title">${transaction.item}</span>
-                            <span class="transaction-amount">${formatCurrency(transaction.amount)}</span>
+                transactionList.innerHTML = sortedTransactions.map(transaction => {
+                    let description = '';
+                    
+                    if (transaction.type === 'loan') {
+                        description = `${MEMBERS[transaction.payer]} cho ${MEMBERS[transaction.sharedWith[0]]} vay tiền`;
+                    } else if (transaction.type === 'payment') {
+                        description = `${MEMBERS[transaction.payer]} trả nợ cho ${MEMBERS[transaction.sharedWith[0]]}`;
+                    } else {
+                        description = `${MEMBERS[transaction.payer]} trả tiền • Chia với: ${transaction.sharedWith.map(p => MEMBERS[p]).join(', ')}`;
+                    }
+
+                    return `
+                        <div class="transaction-item">
+                            <div class="transaction-header">
+                                <span class="transaction-title">${transaction.item}</span>
+                                <span class="transaction-amount">${formatCurrency(transaction.amount)}</span>
+                            </div>
+                            <div class="transaction-details">
+                                ${description} • ${formatDate(transaction.timestamp)}
+                            </div>
                         </div>
-                        <div class="transaction-details">
-                            ${transaction.type === 'loan' 
-                                ? `${MEMBERS[transaction.payer]} cho ${MEMBERS[transaction.sharedWith[0]]} vay tiền` 
-                                : `${MEMBERS[transaction.payer]} trả tiền • Chia với: ${transaction.sharedWith.map(p => MEMBERS[p]).join(', ')}`
-                            } • ${formatDate(transaction.timestamp)}
-                        </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             }
 
             // Cập nhật thống kê dữ liệu
@@ -500,13 +509,30 @@
 
                     const newDebt = currentDebt - amount;
 
+                    // Cập nhật nợ
                     if (newDebt === 0) {
                         await this.debtsRef.child(debtKey).remove();
                     } else {
                         await this.debtsRef.child(debtKey).set(newDebt);
                     }
 
+                    // Thêm vào lịch sử giao dịch
+                    const transactionId = Date.now().toString();
+                    const transaction = {
+                        id: transactionId,
+                        item: "Trả nợ",
+                        amount: amount,
+                        payer: debtor,
+                        sharedWith: [creditor],
+                        perPerson: amount,
+                        timestamp: Date.now(),
+                        type: "payment"
+                    };
+
+                    await this.transactionsRef.child(transactionId).set(transaction);
+
                     await this.loadData();
+                    this.updateDataStats();
                     alert(`${MEMBERS[debtor]} đã trả ${formatCurrency(amount)} cho ${MEMBERS[creditor]}!`);
                 } catch (error) {
                     console.error('Lỗi trả nợ:', error);
