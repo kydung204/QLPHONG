@@ -54,6 +54,37 @@
                         <small id="dataStats">Đang tải thống kê...</small>
                     </div>
                 </div>
+
+                <div class="calculator">
+                    <h4>🧮 Máy tính</h4>
+                    <div class="calc-display">
+                        <input type="text" id="calcDisplay" readonly value="0">
+                    </div>
+                    <div class="calc-buttons">
+                        <button class="calc-btn calc-clear" onclick="clearCalc()">C</button>
+                        <button class="calc-btn calc-operator" onclick="appendCalc('/')">/</button>
+                        <button class="calc-btn calc-operator" onclick="appendCalc('*')">×</button>
+                        <button class="calc-btn calc-operator" onclick="deleteLast()">⌫</button>
+                        
+                        <button class="calc-btn calc-number" onclick="appendCalc('7')">7</button>
+                        <button class="calc-btn calc-number" onclick="appendCalc('8')">8</button>
+                        <button class="calc-btn calc-number" onclick="appendCalc('9')">9</button>
+                        <button class="calc-btn calc-operator" onclick="appendCalc('-')">-</button>
+                        
+                        <button class="calc-btn calc-number" onclick="appendCalc('4')">4</button>
+                        <button class="calc-btn calc-number" onclick="appendCalc('5')">5</button>
+                        <button class="calc-btn calc-number" onclick="appendCalc('6')">6</button>
+                        <button class="calc-btn calc-operator" onclick="appendCalc('+')">+</button>
+                        
+                        <button class="calc-btn calc-number" onclick="appendCalc('1')">1</button>
+                        <button class="calc-btn calc-number" onclick="appendCalc('2')">2</button>
+                        <button class="calc-btn calc-number" onclick="appendCalc('3')">3</button>
+                        <button class="calc-btn calc-equals" onclick="calculateResult()" rowspan="2">=</button>
+                        
+                        <button class="calc-btn calc-number calc-zero" onclick="appendCalc('0')">0</button>
+                        <button class="calc-btn calc-number" onclick="appendCalc('.')">.</button>
+                    </div>
+                </div>
             </div>
 
             <div class="main-content">
@@ -137,6 +168,7 @@
                             <input type="number" id="debtAmount" placeholder="Số tiền trả" required min="1000">
                             
                             <button type="submit" class="btn btn-secondary">Trừ nợ</button>
+                            <button type="button" id="clearAllDebtBtn" class="btn btn-danger">🗑️ Xóa toàn bộ nợ</button>
                         </div>
                     </form>
                 </div>
@@ -573,6 +605,46 @@
                 }
             }
 
+            // Hàm xóa toàn bộ nợ
+            async clearAllDebt(debtor, creditor) {
+                try {
+                    const debtKey = `${debtor}_${creditor}`;
+                    const currentDebt = this.debts[debtKey] || 0;
+
+                    if (currentDebt === 0) {
+                        alert('Không có khoản nợ nào để xóa!');
+                        return;
+                    }
+
+                    if (confirm(`Xác nhận xóa toàn bộ nợ ${formatCurrency(currentDebt)} của ${MEMBERS[debtor]} cho ${MEMBERS[creditor]}?`)) {
+                        // Xóa nợ
+                        await this.debtsRef.child(debtKey).remove();
+
+                        // Thêm vào lịch sử
+                        const transactionId = Date.now().toString();
+                        const transaction = {
+                            id: transactionId,
+                            item: "Xóa toàn bộ nợ",
+                            amount: currentDebt,
+                            payer: debtor,
+                            sharedWith: [creditor],
+                            perPerson: currentDebt,
+                            timestamp: Date.now(),
+                            type: "payment"
+                        };
+
+                        await this.transactionsRef.child(transactionId).set(transaction);
+
+                        await this.loadData();
+                        this.updateDataStats();
+                        alert(`Đã xóa toàn bộ nợ ${formatCurrency(currentDebt)} của ${MEMBERS[debtor]} cho ${MEMBERS[creditor]}!`);
+                    }
+                } catch (error) {
+                    console.error('Lỗi xóa nợ:', error);
+                    alert('Có lỗi xảy ra: ' + error.message);
+                }
+            }
+
             setupEventListeners() {
                 // Member selection
                 document.querySelectorAll('.member-item').forEach(item => {
@@ -669,6 +741,24 @@
                         e.target.reset();
                     }
                 });
+
+                // Clear all debt button
+                document.getElementById('clearAllDebtBtn').addEventListener('click', () => {
+                    const debtor = document.getElementById('debtor').value;
+                    const creditor = document.getElementById('creditor').value;
+
+                    if (!debtor || !creditor) {
+                        alert('Vui lòng chọn người nợ và người cho nợ!');
+                        return;
+                    }
+
+                    if (debtor === creditor) {
+                        alert('Người nợ và người cho nợ không thể giống nhau!');
+                        return;
+                    }
+
+                    this.clearAllDebt(debtor, creditor);
+                });
             }
         }
 
@@ -676,6 +766,150 @@
         document.addEventListener('DOMContentLoaded', () => {
             new DebtManager();
         });
+
+        // Calculator functions
+        let calcDisplay = '';
+        let shouldResetDisplay = false;
+
+        function appendCalc(value) {
+            const display = document.getElementById('calcDisplay');
+            
+            if (shouldResetDisplay) {
+                display.value = '';
+                shouldResetDisplay = false;
+            }
+            
+            if (display.value === '0' && value !== '.') {
+                display.value = value;
+            } else {
+                display.value += value;
+            }
+        }
+
+        function clearCalc() {
+            document.getElementById('calcDisplay').value = '0';
+            shouldResetDisplay = false;
+        }
+
+        function deleteLast() {
+            const display = document.getElementById('calcDisplay');
+            if (display.value.length > 1) {
+                display.value = display.value.slice(0, -1);
+            } else {
+                display.value = '0';
+            }
+        }
+
+        function calculateResult() {
+            const display = document.getElementById('calcDisplay');
+            try {
+                // Thay thế × bằng * để tính toán
+                const expression = display.value.replace(/×/g, '*');
+                const result = eval(expression);
+                display.value = result;
+                shouldResetDisplay = true;
+            } catch (error) {
+                display.value = 'Error';
+                shouldResetDisplay = true;
+            }
+        }
     </script>
+    <style>
+        /* Calculator Styles */
+        .calculator {
+            border-top: 2px solid #e2e8f0;
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+
+        .calculator h4 {
+            color: #1e293b;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .calc-display {
+            margin-bottom: 0.5rem;
+        }
+
+        .calc-display input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            text-align: right;
+            background: #f8fafc;
+            font-family: monospace;
+        }
+
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.25rem;
+        }
+
+        .calc-btn {
+            padding: 0.75rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .calc-number {
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .calc-number:hover {
+            background: #e2e8f0;
+        }
+
+        .calc-operator {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .calc-operator:hover {
+            background: #2563eb;
+        }
+
+        .calc-equals {
+            background: #10b981;
+            color: white;
+            grid-row: span 2;
+        }
+
+        .calc-equals:hover {
+            background: #059669;
+        }
+
+        .calc-clear {
+            background: #ef4444;
+            color: white;
+        }
+
+        .calc-clear:hover {
+            background: #dc2626;
+        }
+
+        .calc-zero {
+            grid-column: span 2;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            margin-left: 0.5rem;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+    </style>
 </body>
 </html>
