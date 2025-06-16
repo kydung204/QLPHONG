@@ -146,59 +146,63 @@
                 </div>
 
                 <div class="manual-debt">
-                    <h3>Trừ nợ thủ công</h3>
-                    <form id="manualDebtForm">
-                        <div class="form-row">
-                            <select id="debtor" required>
-                                <option value="">Người nợ</option>
-                                <option value="A">Dũng</option>
-                                <option value="B">Quang</option>
-                                <option value="C">Văn</option>
-                                <option value="D">Cường</option>
-                            </select>
-                            
-                            <select id="creditor" required>
-                                <option value="">Người cho nợ</option>
-                                <option value="A">Dũng</option>
-                                <option value="B">Quang</option>
-                                <option value="C">Văn</option>
-                                <option value="D">Cường</option>
-                            </select>
-                            
-                            <input type="number" id="debtAmount" placeholder="Số tiền trả" required min="1000">
-                            
-                            <button type="submit" class="btn btn-secondary">Trừ nợ</button>
-                            <button type="button" id="clearAllDebtBtn" class="btn btn-danger">🗑️ Xóa toàn bộ nợ</button>
-                        </div>
-                    </form>
-                </div>
+    <h3>Trừ nợ thủ công</h3>
+    <form id="manualDebtForm">
+        <div class="form-row">
+            <select id="debtor" required>
+                <option value="">Người nợ</option>
+                <option value="A">Dũng</option>
+                <option value="B">Quang</option>
+                <option value="C">Văn</option>
+                <option value="D">Cường</option>
+            </select>
+            
+            <select id="creditor" required>
+                <option value="">Người cho nợ</option>
+                <option value="A">Dũng</option>
+                <option value="B">Quang</option>
+                <option value="C">Văn</option>
+                <option value="D">Cường</option>
+            </select>
+            
+            <input type="number" id="debtAmount" placeholder="Số tiền trả" required min="1000">
+            
+            <div class="form-row-buttons">
+                <button type="submit" class="btn btn-secondary">Trừ nợ</button>
+                <button type="button" id="clearAllDebtBtn" class="btn btn-danger">🗑️ Xóa toàn bộ nợ</button>
+            </div>
+        </div>
+    </form>
+</div>
 
                 <div class="loan-money">
-                    <h3>Nợ tiền (Cho vay)</h3>
-                    <form id="loanForm">
-                        <div class="form-row">
-                            <select id="lender" required>
-                                <option value="">Người cho vay</option>
-                                <option value="A">Dũng</option>
-                                <option value="B">Quang</option>
-                                <option value="C">Văn</option>
-                                <option value="D">Cường</option>
-                            </select>
-                            
-                            <select id="borrower" required>
-                                <option value="">Người vay</option>
-                                <option value="A">Dũng</option>
-                                <option value="B">Quang</option>
-                                <option value="C">Văn</option>
-                                <option value="D">Cường</option>
-                            </select>
-                            
-                            <input type="number" id="loanAmount" placeholder="Số tiền cho vay" required min="1000">
-                            
-                            <button type="submit" class="btn btn-primary">Ghi nợ</button>
-                        </div>
-                    </form>
-                </div>
+    <h3>Nợ tiền (Cho vay)</h3>
+    <form id="loanForm">
+        <div class="form-row">
+            <select id="lender" required>
+                <option value="">Người cho vay</option>
+                <option value="A">Dũng</option>
+                <option value="B">Quang</option>
+                <option value="C">Văn</option>
+                <option value="D">Cường</option>
+            </select>
+            
+            <select id="borrower" required>
+                <option value="">Người vay</option>
+                <option value="A">Dũng</option>
+                <option value="B">Quang</option>
+                <option value="C">Văn</option>
+                <option value="D">Cường</option>
+            </select>
+            
+            <input type="number" id="loanAmount" placeholder="Số tiền cho vay" required min="1000">
+            
+            <div class="form-row-buttons">
+                <button type="submit" class="btn btn-primary">Ghi nợ</button>
+            </div>
+        </div>
+    </form>
+</div>
             </div>
         </div>
 
