@@ -348,6 +348,7 @@ body {
 .data-management {
   border-top: 2px solid #e2e8f0;
   padding-top: 1rem;
+  margin-top: 1rem;
 }
 
 .data-management h4 {
@@ -664,5 +665,105 @@ body {
 
   .nav-menu a {
     text-align: center;
+  }
+}
+
+/* Account Info Styles */
+.account-info {
+  border-top: 2px solid #e2e8f0;
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
+
+.account-info h4 {
+  color: #1e293b;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.account-details {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.account-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem 0;
+}
+
+.account-item label {
+  font-weight: 600;
+  color: #475569;
+  font-size: 0.9rem;
+}
+
+.account-item span {
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.account-number {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.copy-btn {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+}
+
+.copy-btn:hover {
+  background: #2563eb;
+  transform: scale(1.05);
+}
+
+.qr-section {
+  text-align: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.qr-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 0.5rem;
+}
+
+.qr-note {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* Responsive cho account info */
+@media (max-width: 768px) {
+  .account-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .account-number {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .qr-image {
+    width: 100px;
+    height: 100px;
   }
 }
